@@ -1,0 +1,28 @@
+#!/bin/bash
+# Atualiza os pacotes e instala o Apache
+
+if [ -f /etc/debian_version ]; then
+    apt update -y && apt install -y apache2
+    systemctl enable apache2
+    systemctl start apache2
+elif [ -f /etc/redhat-release ]; then
+    yum update -y && yum install -y httpd
+    systemctl enable httpd
+    systemctl start httpd
+fi
+
+# Obtém o hostname da máquina
+HOSTNAME=$(hostname)
+
+# Cria um index.html com o hostname
+echo "<html><body><h1>Hostname: $HOSTNAME</h1></body></html>" > /var/www/html/index.html
+
+# Reinicia o Apache para aplicar as mudanças
+if [ -f /etc/debian_version ]; then
+    systemctl restart apache2
+elif [ -f /etc/redhat-release ]; then
+    systemctl restart httpd
+fi
+
+# Mensagem de conclusão no console
+echo "Instalação concluída! Apache rodando em $(hostname -I | awk '{print $1}')"
